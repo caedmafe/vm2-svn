@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<mosinstall type="component">
+	<name>MartLanguages</name>
+	<creationDate>22.01.2008</creationDate>
+	<author>Soeren Eberhardt &amp; the VirtueMart dev team</author>
+	<copyright>released under GNU General Public License</copyright>
+	<authorEmail>soeren@virutemart.net</authorEmail>
+	<authorUrl>www.virtuemart.net</authorUrl>
+	<version>1.1c</version>
+	<description>Language File Manager for VirtueMart 1.1</description>
+  
+  <install>
+  </install>
+  <uninstall>
+  </uninstall>
+  <installfile>install.martlanguages.php</installfile>
+  <uninstallfile>uninstall.martlanguages.php</uninstallfile>
+	<administration>
+    <menu>VirtueMart Language Manager</menu>
+      <files>
+        <filename>admin.martlanguages.html.php</filename>
+        <filename>admin.martlanguages.php</filename>
+        <filename>compat.php42x.php</filename>
+        <filename>index.html</filename>
+        <filename>languagemanager.class.php</filename>
+        <filename>README.txt</filename>
+        <filename>toolbar.martlanguages.html.php</filename>
+        <filename>toolbar.martlanguages.php</filename>
+      </files>
+    </administration>
+</mosinstall>

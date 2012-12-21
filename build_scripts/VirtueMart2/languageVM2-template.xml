@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="file" version="2.5" method="upgrade">
+
+    <name>${PHING.VM.LANGUAGE.PACKAGENAME}</name>
+    <author>The VirtueMart Development and Translation Team</author>
+    <creationDate>${PHING.VM.RELDATE}</creationDate>
+    <copyright>${PHING.VM.COPYRIGHT}</copyright>
+    <license>${PHING.VM.LICENSE}</license>
+    <authorEmail>max|at|virtuemart.net</authorEmail>
+    <authorUrl>http://www.virtuemart.net</authorUrl>
+    <version>${PHING.VM.RELEASE}</version>
+    <description>This ${PHING.VM.LANGUAGE.NAME} language pack for VirtueMart has been installed successfully. It includes files for the component, modules,
+        and plugins. Some languages may not have all the files.</description>
+
+    <!-- Fileset definition -->
+    <fileset>
+        <files>
+            <file type="language" client="site" id="${PHING.VM.LANGUAGE.NAME}">site_${PHING.VM.LANGUAGE.NAME}.zip</file>
+            <file type="language" client="administrator" id="${PHING.VM.LANGUAGE.NAME}">admin_${PHING.VM.LANGUAGE.NAME}.zip</file>
+        </files>
+    </fileset>
+</extension>

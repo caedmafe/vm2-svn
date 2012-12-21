@@ -1,0 +1,72 @@
+These are the build scripts for VirtueMart 2
+You will need them to build installable archives out of the SVN sources.
+
+I. Software dependencies
+=====================
+I.1. Install phing
+------------------
+Phing is a PHP project build tool based on  Apache Ant.
+It uses of simple XML build files and extensible PHP "task" classes in order to build installers easily.
+
+useful links:
+http://www.phing.info/trac/wiki/Users/Download
+http://www.phing.info/trac/wiki/Users/Installation
+http://docs.joomla.org/Extension_development_using_eclipse_and_phing
+
+I.2. Install svncontrol
+----------------------
+This pear package allows to retrieve some data from the svn repository
+
+useful links:
+http://pear.php.net/package/VersionControl_SVN/download
+
+
+
+II. Adjust the file config.properties
+=================================
+Open the file "config.properties" (should be in the same directory as this HOWTO file) with a Text Editor.
+
+
+package.abspath=/Users/valerie/VIRTUEMART/Packages/VirtueMart
+; export.to: absolute path of the exported files
+export.to=/Users/valerie/VIRTUEMART/Packages/export/virtuemart
+; export.fom.repository: will export the files from the repository. Otherwise, export the files "manually" to "export.to"
+export.from.repository=1
+; your svn bin C:\Program Files\Subversion\bin\svn.exe
+svn.path=
+
+
+III. Run the Build files build_virtuemart2.xml
+=============================================
+1. change in build_virtuemart2.xml those values:
+- vm.version
+- releasetype (if necessary)
+- PHING.VM.CODENAME
+
+2. From your IDE, run the build file build_virtuemart2.xml
+
+3. create a zip called com_virtuemart.2.x.y_extract_first.zip containing :
+- com_virtuemart.2.x.y.zip
+- com_virtuemart.2.x.y_ext_aio.zip
+
+4. create a zip called com_virtuemart.2.x.y_extract_first.targz.zip containing :
+- com_virtuemart.2.0.xx.tar.gz
+- com_virtuemart.2.x.y_ext_aio.tar.gz
+
+
+IV. What does the script exactly ?
+===================================
+For each installer, the Phing tokens included in some files are replaced with their property values.
+1. Removes all folder from a previous installer with the same version  number
+2. Export from the repository all files in the same folder as the build file
+3. Creates the com_virtuemart installer.
+4. Creates the languages installer. The xml file is automatically updated and included for each language.
+5. Creates the com_virtuemart_allinone installer.
+
+V. How to remove some languages from the AIO installer ?
+=========================================================
+add the language in the property name 'languages'
+example:
+    <property name="languages" value="cs-CZ,da-DK,et-EE,fa-IR,lt-LT,hu-HU,nb-NO,nl-NL,pl-PL,pt-PT,sl-SI,sv-SE,tr-TR,sk-SK" />
+
+

@@ -1,0 +1,2 @@
+This is a placeholder for the virtuemart_1.5.zip file which is an export of the 
+most recent Virtuemart 1.5 code.

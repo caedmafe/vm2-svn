@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="VIRTUEMART2" default="VIRTUEMART2"  basedir=".">
+    <!-- value can be: major, minor, bugfix -->
+    <property name="releasetype" value="MINOR"/>
+    <property name="vm.version" value="2.0.8g"/>
+    <property name="PHING.VM.CODENAME" value="Vino" />
+    <property file="build.properties"/>
+    <target name="title">
+        <echo message="BUILD VirtueMart 2 package FROM ${build.main.path} and ${build.aio.path} TO ${package.abspath}"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- environment dependent variable -->
+    <!-- ============================================  -->
+    <!-- FROM -->
+    <property name="component.name" value="com_virtuemart"/>
+    <property name="site.component.path" value="${build.main.path}/components/${component.name}"/>
+    <property name="admin.component.path" value="${build.main.path}/administrator/components/${component.name}"/>
+    <property name="admin.language.path" value="${build.main.path}/administrator/language"/>
+    <property name="site.language.path" value="${build.main.path}/language"/>
+    <property name="modules.path" value="${build.main.path}/modules"/>
+    <property name="plugins.path" value="${build.main.path}/plugins"/>
+    <property name="languageBE.path" value="${build.main.path}/administrator/language"/>
+    <property name="languageFE.path" value="${build.main.path}/language"/>
+
+
+    <property name="vm.main.filename" value="${component.name}.${vm.version}"/>
+    <property name="vm.aio.filename" value="${component.name}.${vm.version}_ext_aio"/>
+    <property name="vm.language.filename" value="${component.name}_language.${vm.version}"/>
+    <property name="vm.extract.filename" value="${component.name}.${vm.version}_extract_first"/>
+
+    <!-- DESTINATION -->
+    <property name="package.folder" value="${package.abspath}/${component.name}.${vm.version}"/>
+    <property name="package.folder.main" value="${package.abspath}/${component.name}.${vm.version}/${component.name}.${vm.version}"/>
+    <property name="package.folder.aio" value="${package.abspath}/${component.name}.${vm.version}/${component.name}.aio.${vm.version}"/>
+    <property name="package.folder.language" value="${package.abspath}/${component.name}.${vm.version}/${component.name}.languages.${vm.version}"/>
+
+    <property name="package.admin.aio" value="${package.folder.aio}/admin"/>
+    <property name="package.plugins.aio" value="${package.admin.aio}/plugins"/>
+    <property name="package.modules.aio" value="${package.admin.aio}/modules"/>
+    <property name="package.languageBE.aio" value="${package.admin.aio}/languageBE"/>
+    <property name="package.languageFE.aio" value="${package.admin.aio}/languageFE"/>
+    <property name="package.language.aio" value="${package.admin.aio}/language"/>
+    <property name="package.librairies.aio" value="${package.admin.aio}/librairies"/>
+    <property name="delete_install_aio_file" value="${package.folder.aio}/script.vmallinone.php"/>
+
+    <!-- loop through languages, delete those languages from the AIO, create a language package with them -->
+    <property name="languages" value="cs-CZ,da-DK,et-EE,fa-IR,lt-LT,hu-HU,nb-NO,nl-NL,pl-PL,pt-PT,sl-SI,sv-SE,tr-TR,sk-SK,zh-TW,zh-CN,el-GR,ru-RU,fi-FI,it-IT" />
+
+    <!-- ============================================  -->
+    <!-- SVN EXPORT variables -->
+    <!-- ============================================  -->
+    <property name="svn.main.repository" value="https://dev.virtuemart.net/svn/virtuemart/trunk/virtuemart" />
+    <property name="svn.aio.repository" value="https://dev.virtuemart.net/svn/virtuemart/trunk/ModulesPluginsInstaller" />
+    <property name="svn.main.path" value="virtuemart" />
+    <property name="svn.aio.path" value="ModulesPluginsInstaller" />
+
+    <svnlastrevision
+            repositoryurl="${svn.main.repository}"
+            propertyname="svn.lastrevision"/>
+
+    <!-- ============================================  -->
+    <!-- used in version.php , and .xml files variables -->
+    <!-- ============================================  -->
+    <tstamp />
+    <property name="PHING.VM.PRODUCT" value="VirtueMart" />
+    <property name="PHING.VM.RELEASE" value="${vm.version}" />
+    <property name="PHING.VM.DEV_STATUS" value="${releasetype}" />
+
+    <property name="PHING.VM.RELDATE" value="${TODAY}" />
+    <property name="PHING.VM.RELTIME" value="${TSTAMP}" />
+    <property name="PHING.VM.RELTZ" value="GMT" />
+    <property name="PHING.VM.REVISION" value="${svn.lastrevision}" />
+    <tstamp>
+        <format property="PHING.VM.YEAR" pattern="%Y" />
+    </tstamp>
+    <property name="PHING.VM.COPYRIGHT" value="Copyright (C) 2004-${PHING.VM.YEAR} Virtuemart Team. All rights reserved." />
+    <property name="PHING.VM.LICENSE" value="http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL" />
+
+
+    <!-- ============================================  -->
+    <!-- DELETE OLD VERSION IF EXIST -->
+    <!-- ============================================  -->
+    <target name="delete_package_folder" depends="">
+        <available file="${package.folder}" property="package.folder.exists" value="1"/>
+        <if>
+            <equals arg1="${package.folder.exists}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing package folder: ${package.folder}..."/>
+                <delete dir="${package.folder}"/>
+            </then>
+        </if>
+    </target>
+    <target name="delete_install_aio" depends="">
+
+        <available file="${delete_install_aio_file}" property="delete_install_aio_file.exists" value="1"/>
+        <if>
+            <equals arg1="${delete_install_aio_file.exists}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing INSTALL AOI folder: ${delete_install_aio_file}..."/>
+                <delete dir="${delete_install_aio_file}"/>
+            </then>
+        </if>
+    </target>
+    <!-- SVN EXPORT Force overwrite files if they already exist: may be not needed-->
+    <target name="do_delete_aio_build_folder"  >
+        <if>
+            <equals arg1="${do.export.svn}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing build folder: ${build.aio.path}..."/>
+                <delete dir="${build.aio.path}"/>
+            </then>
+        </if>
+    </target>
+    <target name="do_delete_main_build_folder" >
+        <available file="${build.main.path}" property="build.main.path.exists" value="1"/>
+        <if>
+            <equals arg1="${do.export.svn}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing build folder: ${build.main.path}..."/>
+                <delete dir="${build.main.path}"/>
+            </then>
+        </if>
+    </target>
+    <target name="delete_aio_build_folder"  >
+        <available file="${build.aio.path}" property="build.aio.path.exists" value="1"/>
+        <if>
+            <equals arg1="${build.aio.path.exists}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing build folder: ${build.aio.path}..."/>
+                <delete dir="${build.aio.path}"/>
+            </then>
+        </if>
+
+    </target>
+    <target name="delete_main_build_folder" >
+        <available file="${build.main.path}" property="build.main.path.exists" value="1"/>
+        <if>
+            <equals arg1="${build.main.path.exists}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing build folder: ${build.main.path}..."/>
+                <delete dir="${build.main.path}"/>
+            </then>
+        </if>
+    </target>
+
+
+
+    <!-- ============================================  -->
+    <!-- Target: CREATE THE DST DIRECTORY              -->
+    <!-- ============================================  -->
+    <target name="create_package_folder">
+        <echo msg="Create Package destination directory"/>
+        <mkdir dir="${package.folder}"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!--  FILESET ALL MAIN COMPONENT FILES -->
+    <!-- ============================================  -->
+    <fileset dir="${site.component.path}" id='site.main.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+
+    <fileset dir="${admin.component.path}" id='admin.main.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name="virtuemart.xml"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+    <fileset dir="${admin.component.path}/install" id='install.main.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+    <fileset dir="${site.language.path}/en-GB" id='site.language.main.files' defaultexcludes="true">
+        <include name="en-GB.${component.name}**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+
+    <fileset dir="${admin.language.path}/en-GB" id='admin.language.main.files' defaultexcludes="true">
+        <include name="en-GB.${component.name}**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+    <fileset dir="${admin.component.path}" id='xml.main.file' defaultexcludes="true">
+        <include name="virtuemart.xml"/>
+    </fileset>
+ <fileset dir="${build.main.path}" id='readme.main.file' defaultexcludes="true">
+        <include name="README-VIRTUEMART.txt"/>
+    </fileset>
+
+    <!-- ============================================  -->
+    <!--  FILESET all AIO component files              -->
+    <!-- ============================================  -->
+    <fileset dir="${build.aio.path}" id='admin.aio.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+        <exclude name="synchrow.cmd"/>
+    </fileset>
+
+    <fileset dir="${package.admin.aio}" id='install.aio.file' defaultexcludes="true">
+        <include name="script.vmallinone.php"/>
+    </fileset>
+
+    <fileset dir="${modules.path}" id='modules.aio.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+
+    <fileset dir="${plugins.path}" id='plugins.aio.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+
+    <fileset dir="${languageBE.path}" id='languageBE.aio.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+    <fileset dir="${languageFE.path}" id='languageFE.aio.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+
+    </fileset>
+    <fileset dir="${languageBE.path}" id='language.aio.files' defaultexcludes="true">
+        <include name="**"/>
+        <exclude name=".svn"/>
+        <exclude name=".DS_Store"/>
+    </fileset>
+    <fileset dir="${package.admin.aio}" id='script.aio.files' defaultexcludes="true">
+        <include name="script.vmallinone.php"/>
+    </fileset>
+
+
+
+    <!-- ============================================  -->
+    <!--  Remove some languages files              -->
+    <!-- ============================================  -->
+
+    <target name="delete.language.loop">
+        <foreach list="${languages}" param="lang" target="delete_language_folder" >
+        </foreach>
+    </target>
+    <target name="delete_language_folder" depends="">
+        <property name="package.languageFE" value="${package.languageFE.aio}/${lang}"/>
+        <property name="package.languageBE" value="${package.languageBE.aio}/${lang}"/>
+        <echo msg="DELETE ...${lang}... ${package.languageBE} ...${package.languageFE}"/>
+        <available file="${package.languageBE}" property="package.languageBE.exists" value="1"/>
+        <if>
+            <equals arg1="${package.languageBE.exists}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing package folder: ${package.languageBE}..."/>
+                <delete dir="${package.languageBE}"/>
+            </then>
+        </if>
+        <available file="${package.languageFE}" property="package.languageFE.exists" value="1"/>
+        <if>
+            <equals arg1="${package.languageFE.exists}" arg2="1"/>
+            <then>
+                <echo message="Deleting existing package folder: ${package.languageFE}..."/>
+                <delete dir="${package.languageFE}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- ============================================  -->
+    <!--  CREATE some languages files              -->
+    <!-- ============================================  -->
+
+    <target name="build.language.loop">
+        <foreach list="${languages}" param="lang" target="build_language_folder" >
+        </foreach>
+    </target>
+
+    <target name="build_language_folder" depends="">
+        <property name="package.language.src.languageFE" value="${package.languageFE.aio}/${lang}"/>
+        <property name="package.language.src.languageBE" value="${package.languageBE.aio}/${lang}"/>
+        <property name="package.language.dst.languageFE" value="${package.folder.language}/${lang}/site/${lang}"/>
+        <property name="package.language.dst.languageBE" value="${package.folder.language}/${lang}/admin/${lang}"/>
+        <property name="package.language.dst.languageFE.name" value="${package.folder.language}/${lang}/site_${lang}.zip"/>
+        <property name="package.language.dst.languageBE.name" value="${package.folder.language}/${lang}/admin_${lang}.zip"/>
+        <property name="package.language.dst.folder" value="${package.folder.language}/${lang}"/>
+        <property name="package.language.dst.zip" value="${package.folder.language}/com_virtuemart_${lang}.zip"/>
+        <property name="PHING.VM.LANGUAGE.PACKAGENAME" value="com_virtuemart_${lang}" />
+        <property name="PHING.VM.LANGUAGE.NAME" value="${lang}" />
+        <echo msg="Language loop ...${lang}... src=${package.language.src.languageBE} ...dest=${package.language.dst.languageFE}"/>
+        <fileset dir="${package.language.src.languageFE}" id='languageFE.files' defaultexcludes="true">
+            <include name="**"/>
+            <include name="admin/**"/>
+            <include name="site/**"/>
+            <exclude name=".svn"/>
+            <exclude name=".DS_Store"/>
+        </fileset>
+        <fileset dir="${package.language.src.languageBE}" id='languageBE.files' defaultexcludes="true">
+            <include name="**"/>
+            <exclude name=".svn"/>
+            <exclude name=".DS_Store"/>
+        </fileset>
+        <fileset dir="." id='languageFE.xml'  >
+            <include name="languageVM2-template.xml"/>
+        </fileset>
+        <copy todir="${package.language.dst.languageFE}" overwrite="true">
+            <fileset refid="languageFE.files"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <zip destfile="${package.language.dst.languageFE.name}"  >
+            <fileset dir="${package.language.dst.languageFE}" >
+                <include name="**"/>
+            </fileset>
+        </zip>
+        <copy todir="${package.language.dst.languageBE}" overwrite="true">
+            <fileset refid="languageBE.files"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <zip destfile="${package.language.dst.languageBE.name}"  >
+            <fileset dir="${package.language.dst.languageBE}" >
+                <include name="**"/>
+            </fileset>
+        </zip>
+        <copy todir="${package.language.dst.folder}" overwrite="true">
+            <fileset refid="languageFE.xml"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <move file="${package.language.dst.folder}/languageVM2-template.xml" tofile="${package.language.dst.folder}/com_virtuemart_${lang}.xml"/>
+        <echo msg="Creating ...${lang}... ${package.language.dst.zip} "/>
+        <delete file="${package.language.dst.zip}"   />
+        <echo msg="Include ${package.language.dst.languageFE.name}..${package.language.dst.languageBE.name}.. ${package.language.dst.folder}/com_virtuemart_${lang}.xml" />
+        <zip destfile="${package.language.dst.zip}"  >
+            <fileset dir="${package.language.dst.folder}" >
+                <include name="**"/>
+                <exclude name="admin/**"/>
+                <exclude name="site/**"/>
+            </fileset>
+        </zip>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- TARGET: copy all files for the MAIN component                           -->
+    <!-- ============================================  -->
+    <target name="main_files">
+        <echo msg="Copying ADMIN COMPONENT files to directory..."/>
+        <copy todir="${package.folder.main}/administrator/components/${component.name}">
+            <fileset refid="admin.main.files"/>
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+        <echo msg="Copying SITE COMPONENT files to directory.. "/>
+        <copy todir="${package.folder.main}/components/${component.name}">
+            <fileset refid="site.main.files"/>
+        </copy>
+        <echo msg="Copying INSTALL files to directory..."/>
+        <copy todir="${package.folder.main}/install">
+            <fileset refid="install.main.files"/>
+        </copy>
+        <echo msg="Copying SITE LANGUAGE files to directory... "/>
+        <copy todir="${package.folder.main}/language/en-GB">
+            <fileset refid="site.language.main.files"/>
+        </copy>
+        <echo msg="Copying ADMIN LANGUAGE files to directory..."/>
+        <copy todir="${package.folder.main}/administrator/language/en-GB">
+            <fileset refid="admin.language.main.files"/>
+        </copy>
+        <echo msg="UPDATE AND COPY VERSION.PHP  to directory..."/>
+        <echo msg="Copying INSTALL XML to directory..."/>
+        <copy todir="${package.folder.main}">
+            <fileset refid="xml.main.file"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+         <echo msg="Copying README file to directory..."/>
+        <copy todir="${package.folder.main}">
+             <fileset refid="readme.main.file"/>
+        </copy>
+    </target>
+    <!-- ============================================  -->
+    <!-- TARGET: copy all files for the AIO component  -->
+    <!-- ============================================  -->
+    <target name="aio_files">
+        <echo msg="Copying AIO COMPONENT files to directory..."/>
+        <copy todir="${package.folder.aio}">
+            <fileset refid="admin.aio.files"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+
+
+            <available file="${delete_install_aio_file}" property="delete_install_aio_file.exists" value="1"/>
+            <if>
+                <equals arg1="${delete_install_aio_file.exists}" arg2="1"/>
+                <then>
+                    <echo message="Deleting existing INSTALL AOI folder: ${delete_install_aio_file}..."/>
+                    <delete file="${delete_install_aio_file}"/>
+                </then>
+            </if>
+
+        <echo msg="copy file script vmallinone script from the admin ${package.admin.aio}...to root ${package.folder.aio}"/>
+        <copy todir="${package.folder.aio}">
+            <fileset refid="install.aio.file"/>
+        </copy>
+
+        <echo msg="Copying AIO: modules files to directory.."/>
+        <copy todir="${package.modules.aio}" overwrite="true">
+            <fileset refid="modules.aio.files"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+
+        <echo msg="Copying AIO: plugins files to directory.."/>
+        <copy todir="${package.plugins.aio}" overwrite="true">
+            <fileset refid="plugins.aio.files"/>
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <echo msg="Copying AIO: languageBE files to directory..."/>
+        <copy todir="${package.languageBE.aio}" overwrite="true">
+            <fileset refid="languageBE.aio.files"/>
+        </copy>
+        <echo msg="Copying AIO: languageFE files to directory..."/>
+        <copy todir="${package.languageFE.aio}" overwrite="true">
+            <fileset refid="languageFE.aio.files"/>
+        </copy>
+        <echo msg="Copying AIO: SCRIPT from the admin ${package.admin.aio} to the root folder ${package.admin.aio}..."/>
+        <copy todir="${package.folder.aio}" overwrite="true">
+            <fileset refid="script.aio.files"/>
+        </copy>
+        <!--echo msg="Copying AIO: language files to directory..."/>
+        <copy todir="${package.language.aio}" overwrite="true">
+            <fileset refid="language.aio.files"/>
+        </copy-->
+    </target>
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT)  SVN export            -->
+    <!-- ============================================  -->
+    <target name="svn.export">
+        <if>
+            <equals arg1="${do.export.svn}" arg2="1" />
+            <then>
+                <echo message="Export from svn" />
+                <svnexport
+                        nocache="true"
+                        repositoryurl="${svn.main.repository}"
+                        todir="${build.main.path}"/>
+                <svnexport
+                        nocache="true"
+                        repositoryurl="${svn.aio.repository}"
+                        todir="${build.aio.path}"/>
+            </then>
+            <else>
+                <echo message="Don't Export from svn" />
+            </else>
+        </if>
+
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT)  CREATE TAR FILES                -->
+    <!-- ============================================  -->
+    <target name="clean" depends="delete_package_folder, create_package_folder, do_delete_main_build_folder, do_delete_aio_build_folder">
+        <echo msg="Cleaning Package directory OK!"/>
+    </target>
+
+    <target name="Main" depends="main_files">
+        <echo msg="Creating MAIN PACKAGE  ..."/>
+        <tar destfile="${package.folder}/${component.name}.${vm.version}.tar.gz" compression="gzip">
+            <fileset dir="${package.folder.main}">
+                <include name="**"/>
+                <exclude name=".svn"/>
+                <exclude name=".DS_Store"/>
+            </fileset>
+        </tar>
+        <zip destfile="${package.folder}/${component.name}.${vm.version}.zip"  >
+            <fileset dir="${package.folder.main}">
+                <include name="**"/>
+                <exclude name=".svn"/>
+                <exclude name=".DS_Store"/>
+            </fileset>
+        </zip>
+        <echo msg="MAIN Component compressed OK!"/>
+    </target>
+    <target name="AIO" depends="aio_files,LANGUAGE, delete.language.loop">
+        <echo msg="Creating AIO PACKAGE  ..."/>
+        <tar destfile="${package.folder}/${component.name}.${vm.version}_ext_aio.tar.gz" compression="gzip">
+            <fileset dir="${package.folder.aio}">
+                <include name="**"/>
+                <exclude name=".svn"/>
+                <exclude name=".DS_Store"/>
+            </fileset>
+        </tar>
+        <zip destfile="${package.folder}/${component.name}.${vm.version}_ext_aio.zip"  >
+            <fileset dir="${package.folder.aio}">
+                <include name="**"/>
+                <exclude name=".svn"/>
+                <exclude name=".DS_Store"/>
+            </fileset>
+        </zip>
+        <echo msg="AIO Component compressed OK!"/>
+    </target>
+    <target name="LANGUAGE" depends="build.language.loop">
+        <echo msg="Creating Language PACKAGE  ..."/>
+        <zip destfile="${package.folder}/${component.name}.${vm.version}_languages_extract_first.zip"  >
+            <fileset dir="${package.folder.language}">
+                <include name="*.zip"/>
+            </fileset>
+        </zip>
+        <echo msg="Language package Component compressed OK!"/>
+    </target>
+    <target name="VIRTUEMART2" depends="title, clean ,svn.export, Main,  AIO">
+        <echo msg="LATEST REVISION is ${svn.lastrevision}" />
+        <echo msg="DATE ${TODAY}, TIME ${TSTAMP}" />
+        <!-- DOES not create a correct package for me -->
+        <zip destfile="${package.folder}/${component.name}.${vm.version}_extract_first.zip"  >
+            <fileset dir="${package.folder}">
+                <include name="${package.folder}/${component.name}.${vm.version}.tar.gz"/>
+                <include name="${package.folder}/${component.name}.${vm.version}_ext_aio.tar.gz"/>
+                <exclude name=".DS_Store"/>
+            </fileset>
+        </zip>
+        <echo msg="EXTRACT FIRST compressed in directory OK!"/>
+    </target>
+</project>

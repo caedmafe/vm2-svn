@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<!-- $Id$
+* This file was created for the Ant-driven Build System on dev.virtuemart.net. 
+* It creates deployable documentation from the documentation sources.
+* You won't be able to use this Ant Script on your computer before 
+* you haven't adjusted the file "config.properties" to your local paths
+* @copyright: Greg Perkins, Soeren Eberhardt-Biermann
+* @license: GNU/GPL
+*
+* IMPORTANT: You'll need the XALAN libraries for the DocBook Transformation
+* Ant doesn't ship with them, so download Xalan 2.7.0 here: http://www.apache.org/dyn/closer.cgi/xml/xalan-j
+* and extract the JARs into Ant's /lib directory. They will be added to the java classpath automatically then.
+* Tested Configuration (works well!):
+	* Java >= 1.5
+	* Ant >= 1.7.0 [http://www.apache.org/dist/ant/binaries/]
+	* Xalan >= 2.7.0 [http://www.apache.org/dyn/closer.cgi/xml/xalan-j]
+	* FOP >= 0.94 [http://www.apache.org/dyn/closer.cgi/xmlgraphics/fop]
+	* DocBook XSL 1.71.1 [http://sourceforge.net/project/showfiles.php?group_id=21935&package_id=16608&release_id=456867]
+	* Microsoft HTML Help Workshop [http://www.microsoft.com/downloads/details.aspx?FamilyID=00535334-c8a6-452f-9aa0-d597d16580cc&DisplayLang=en#Overview]
+-->
+<!-- 
+required parameters : 
+	- document.name (User_Manual|Developer_Manual|Installation)
+	
+available Tasks:
+	- "html": Creates the single html documentation
+	- "chunk": Creates the multiple page documentation
+	- "chm": Creates the CHM version of the documentation
+	- "pdf": Creates the PDF version of the documentation
+	
+	Windows Command Line Example (runs the "chm" task to create the CHM file) 
+	"ant.bat -buildfile c:\virtuemart\svn\documentation\build.xml -Ddocument.name=User_Manual chm"
+-->
+<project name="VirtueMart Documentation" default="chunk" basedir=".">
+	<description>Builds the VirtueMart Documentation to various output Formats</description>
+
+	<target name="server" if="CB_DOCDIR">
+		<property name="dist.dir" value="${CB_DOCDIR}/documentation_build" />
+		<property name="svn.dir" value="${CB_SRCDIR}/trunk/documentation" />
+		<property name="stylesheet.dir" value="${CB_SRCDIR}/trunk/documentation/resources" />
+		<property name="xsl.dir" value="/usr/share/xml/docbook/stylesheet/nwalsh" />
+		<property name="fop.dir" value="/usr/share/fop" />
+		<property name="docbook.catalog" value="/etc/sgml/catalog" />
+		<property name="antrun" value="server" />
+		<echo message="Server properties loaded." />
+		<tstamp/>
+	</target>
+	
+	<target name="local" unless="CB_DOCDIR">
+		<property file="config.properties" />
+		<property name="antrun" value="local" />
+		<echo message="Local properties loaded." />
+		<tstamp/>
+	</target>
+
+	<!-- Remove all temporary build files, but leave the directories -->
+	<target name="clean" depends="server,local">
+		<delete includeemptydirs="true">
+			<fileset dir="${dist.dir}/${document.name}" includes="**/*" />
+		</delete>
+		<echo message="Deleted all temporary build files from the '${dist.dir}' directory." />
+	</target>
+
+	<target name="print-vars" depends="server,local">
+		<echo message="Stylesheet directory: ${stylesheet.dir}" />
+		<echo message="Distribution directory: ${dist.dir}" />
+		<echo message="Subversion directory: ${svn.dir}" />
+		<echo message="VM version: ${vm.version}" />
+	</target>
+	
+	<target name="setup" depends="clean">
+		<available file="${svn.dir}/${document.name}/${document.name}.xml" property="document.present"/>
+		<available classname="org.apache.xalan.xslt.Process" property="xalan.present"/>
+		<available file="${htmlhelp.exe}" property="hhc.exe.present"/>
+		<available file="${fop.dir}/fop" property="fop.present"/>
+		<available file="${stylesheet.dir}/virtuemart.xsl" property="virtuemart.xsl.present"/>
+		<available file="${xsl.dir}/xhtml/docbook.xsl" property="docbook.xsl.present"/>
+		
+		<fail unless="document.present" message="The Document [${document.name}] couldn't be found. Maybe the specified Path [${svn.dir}/documentation/${document.name}/] is wrong."/>
+		<fail unless="xalan.present" message="This Build requires the XALAN XSLT Processor (Version &gt;= 2.7.0). Please add the .jar files from the Xalan Distribution to ${ant.home}/lib"/>
+		<fail unless="virtuemart.xsl.present" message="The file virtuemart.xsl couldn't be found. Maybe the specified Path [${stylesheet.dir}] is wrong."/>
+		<fail unless="docbook.xsl.present" message="The DocBook Stylesheet couldn't be found. Maybe the specified Path [${xsl.dir}] is wrong."/>
+		
+		<mkdir dir="${dist.dir}/${document.name}"/>
+		<mkdir dir="${dist.dir}/${document.name}/images"/>
+		<mkdir dir="${dist.dir}/${document.name}/figure"/>
+		<!-- Copy the Images to the Output Dir -->
+		<copy todir="${dist.dir}/${document.name}/figure">
+			<fileset dir="${svn.dir}/${document.name}/figure">
+				<exclude name="**/.svn"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.dir}/${document.name}/images">
+			<fileset dir="${stylesheet.dir}/images">
+				<exclude name=".svn"/>
+			</fileset>
+		</copy>
+		 <copy file="${stylesheet.dir}/virtuemart_book.css" tofile="${dist.dir}/${document.name}/virtuemart.css"/>
+		 <copy file="${stylesheet.dir}/style.css" tofile="${dist.dir}/${document.name}/style.css"/>
+		 <!-- Define the XML Catalogs -->
+		 <xmlcatalog id="docbookDTDs">
+            <catalogpath>
+                <pathelement location="${docbook.catalog}"/>
+            </catalogpath>
+        </xmlcatalog>		 
+	</target>
+
+	<!-- Single HTML File Output -->
+	<target name="html" depends="setup">
+		
+		<xslt in="${svn.dir}/${document.name}/${document.name}.xml" out="${dist.dir}/${document.name}/${document.name}.html">
+			<style>
+				<url url="file://${stylesheet.dir}/book_html_${antrun}.xsl"/>
+			</style>
+			<xmlcatalog refid="docbookDTDs" />
+		</xslt>
+		<zip destfile="${dist.dir}/VirtueMart_${vm.minorversion}_${document.name}_(html).zip" 
+				comment="HTML Documentation for VirtueMart ${vm.minorversion}, created ${TODAY}"
+				basedir="${dist.dir}/${document.name}" 
+		/>
+	</target>
+	<target name="html_server" depends="html">
+			<CBRelease file="${dist.dir}/VirtueMart_${vm.minorversion}_${document.name}_(html).zip" 
+						todir="VirtueMart ${vm.minorversion} Downloads/Documentation" 
+						description="VirtueMart ${vm.minorversion} ${document.name} (Single HTML)" />	
+	</target>
+	
+	<!-- Multiple HTML Files Output (Chunks) -->
+	<target name="chunk" depends="setup">
+		
+		<xslt basedir="${svn.dir}/${document.name}" includes="${document.name}.xml" destdir="${dist.dir}/${document.name}">
+			<style>
+				<url url="file://${stylesheet.dir}/book_chunk_${antrun}.xsl" />
+			</style>
+			<xmlcatalog refid="docbookDTDs" />
+		</xslt>
+		<zip destfile="${dist.dir}/VirtueMart_${vm.minorversion}_${document.name}_(chunks).zip" 
+				comment="HTML Documentation for VirtueMart ${vm.minorversion}, created ${TODAY}"
+				basedir="${dist.dir}/${document.name}" 
+		/>
+	</target>
+	<target name="chunk_server" depends="chunk">
+			<CBRelease file="${dist.dir}/VirtueMart_${vm.minorversion}_${document.name}_(chunks).zip" 
+						todir="VirtueMart ${vm.minorversion} Downloads/Documentation" 
+						description="VirtueMart ${vm.minorversion} ${document.name} (Chunks)" />	
+	</target>
+	
+	<!-- CHM (HTMLHelp) Output -->
+	<target name="chm" depends="setup">
+		<fail unless="hhc.exe.present" message="Microsoft's HMTLHelp Compiler hhc.exe is required to create the CHM file for this document! Check the location setting (htmlhelp.exe): ${htmlhelp.exe}"/>
+		
+		<xslt basedir="${svn.dir}/${document.name}" includes="${document.name}.xml" destdir="${dist.dir}/${document.name}">
+			<style>
+				<url url="file://${stylesheet.dir}/book_htmlhelp_${antrun}.xsl" />
+			</style>
+			<xmlcatalog refid="docbookDTDs" />
+		</xslt>
+		<!-- Compiling the CHM File is done by the Microsoft HTMLHelp Workshop Compiler -->
+		<exec executable="${htmlhelp.exe}" osfamily="windows">
+			<arg value="${dist.dir}\\${document.name}\\htmlhelp.hhp"/>
+		</exec>
+		<!-- Running hhc.exe on Linux with Wine is untested and buggy -->
+		<exec executable="wine" osfamily="unix">
+			<arg value="${htmlhelp.exe} ${dist.dir}/${document.name}/htmlhelp.hhp"/>
+		</exec>
+		<!-- Rename the chm file to reflect the Document Name -->
+		<move file="${dist.dir}/${document.name}/htmlhelp.chm" tofile="${dist.dir}/${document.name}/VirtueMart_${vm.minorversion}_${document.name}.chm"/>
+	</target>
+	<target name="chm_server" depends="chm">
+			<CBRelease file="${dist.dir}/${document.name}/VirtueMart_${vm.minorversion}_${document.name}.chm" 
+						todir="VirtueMart ${vm.minorversion} Downloads/Documentation" 
+						description="VirtueMart ${vm.minorversion} ${document.name} (CHM)" />	
+	</target>
+	
+	<!-- PDF Output using Apache FOP (tested with version 0.94) -->
+	<target name="pdf" depends="setup">
+	
+		<fail unless="fop.present" message="Apache FOP is required to create the PDF file for this document! Check the location setting (fop.dir): ${fop.dir}"/>
+		
+		<xslt in="${svn.dir}/${document.name}/${document.name}.xml" 
+				out="${dist.dir}/${document.name}/${document.name}.fo">
+			<style>
+				<url url="file://${stylesheet.dir}/book_fo_${antrun}.xsl"/>
+			</style>
+			<xmlcatalog refid="docbookDTDs" />
+		</xslt>
+		<exec executable="${fop.dir}/fop" osfamily="unix">
+			<arg line="-c ${fop.dir}/conf/fop.xconf"/>
+			<arg line="-fo ${dist.dir}/${document.name}/${document.name}.fo"/>
+			<arg line="-pdf ${dist.dir}/${document.name}/VirtueMart_${vm.minorversion}_${document.name}.pdf"/>
+		</exec>
+		<exec executable="cmd" osfamily="windows">
+			<arg value="/c"/>
+			<arg value="${fop.dir}/fop.bat -c ${fop.dir}/conf/fop.xconf -fo ${dist.dir}/${document.name}/${document.name}.fo -pdf ${dist.dir}/${document.name}/VirtueMart_${vm.minorversion}_${document.name}.pdf"/>
+		</exec>
+		<delete file="${dist.dir}/${document.name}/${document.name}.fo" />
+	</target>
+	<target name="pdf_server" depends="pdf">
+			<CBRelease file="${dist.dir}/${document.name}/VirtueMart_${vm.minorversion}_${document.name}.pdf" 
+						todir="VirtueMart ${vm.minorversion} Downloads/Documentation" 
+						description="VirtueMart ${vm.minorversion} ${document.name} (PDF)" />	
+	</target>
+</project>

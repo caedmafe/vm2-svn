@@ -1,0 +1,63 @@
+FROM SVN 6416 : ALLINONE COMPONENT HAS BEEN INCLUDED IN THE TRUNK/VIRTUEMART
+THIS BUILD FILE IS OBSOLETE
+
+
+These are the build scripts for VirtueMart 2
+You will need them to build installable archives out of the SVN sources.
+
+I. Software dependencies
+=====================
+I.1. Install phing
+------------------
+Phing is a PHP project build tool based on  Apache Ant.
+It uses of simple XML build files and extensible PHP "task" classes in order to build installers easily.
+
+useful links:
+http://www.phing.info/trac/wiki/Users/Download
+http://www.phing.info/trac/wiki/Users/Installation
+http://docs.joomla.org/Extension_development_using_eclipse_and_phing
+
+I.2. Install svncontrol
+----------------------
+This pear package allows to retrieve some data from the svn repository
+
+useful links:
+http://pear.php.net/package/VersionControl_SVN/download
+
+
+
+II. Adjust the file config.properties
+=================================
+Open the file "config.properties" (should be in the same directory as this HOWTO file) with a Text Editor.
+
+1. change the value of 'package.abspath' to point to the directory where the installer is build
+2. Those parameters do not really need to be changed
+build.main.path
+build.aio.path
+
+
+III. Run the Build files build_virtuemart2.xml
+=============================================
+1. change in build_virtuemart2.xml those values:
+- vm.version
+- releasetype (if necessary)
+- PHING.VM.CODENAME
+
+2. From your IDE, run the build file build_virtuemart2.xml
+
+IV. What does the script exactly ?
+===================================
+For each installer, the Phing tokens included in some files are replaced with their property values.
+1. Removes all folder from a previous installer with the same version  number
+2. Export from the repository all files in the same folder as the build file
+3. Creates the com_virtuemart installer.
+4. Creates the languages installer. The xml file is automatically updated and included for each language.
+5. Creates the com_virtuemart_aio installer.
+
+V. How to remove some languages from the AIO installer ?
+=========================================================
+add the language in the property name 'languages'
+example:
+    <property name="languages" value="cs-CZ,da-DK,et-EE,fa-IR,lt-LT,hu-HU,nb-NO,nl-NL,pl-PL,pt-PT,sl-SI,sv-SE,tr-TR,sk-SK" />
+
+

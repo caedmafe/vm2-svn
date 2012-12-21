@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<!-- $Id$ -->
+<article lang="en">
+  <title>VirtueMart 2.0 Installation Tutorial</title>
+
+  <articleinfo>
+    <graphic fileref="figure/cart.png" />
+
+    <legalnotice>
+      <para>This document is published under the Open Content License
+      available from <ulink url="http://www.opencontent.org/opl.shtml">
+      http://www.opencontent.org/opl.shtml</ulink></para>
+
+      <para><trademark>Joomla!</trademark> is a Trademark of Open Source
+      Matters, Inc.</para>
+
+      <para><trademark>Mambo</trademark> is a Trademark of The Mambo
+      Foundation, Inc.</para>
+    </legalnotice>
+
+    <author>
+      <firstname>Soeren</firstname>
+
+      <surname>Eberhardt-Biermann</surname>
+
+      <contrib><ulink type=""
+      url="http://www.VirtueMart.net">www.virtuemart.net</ulink></contrib>
+    </author>
+
+    <copyright>
+      <year>2005-2008</year>
+
+      <holder>Soeren Eberhardt-Biermann</holder>
+    </copyright>
+
+    <revhistory>
+      <revision>
+        <revnumber>1.0</revnumber>
+
+        <date>November 23, 2005</date>
+
+        <authorinitials>soeren_nb</authorinitials>
+
+        <revremark>Initial Release for VirtueMart 1.0.0 final</revremark>
+      </revision>
+
+      <revision>
+        <revnumber>1.1</revnumber>
+
+        <date>March 10, 2006</date>
+
+        <authorinitials>soeren_nb</authorinitials>
+
+        <revremark>Updated for VirtueMart 1.0.3</revremark>
+      </revision>
+
+      <revision>
+        <revnumber>1.2</revnumber>
+
+        <date>June 2006</date>
+
+        <authorinitials>soeren_nb</authorinitials>
+
+        <revremark>Update for VirtueMart 1.0.5</revremark>
+      </revision>
+
+      <revision>
+        <revnumber>1.3</revnumber>
+
+        <date>March 2007</date>
+
+        <authorinitials>soeren_nb</authorinitials>
+
+        <revremark>Update for VirtueMart 1.0.10</revremark>
+      </revision>
+
+      <revision>
+        <revnumber>1.4</revnumber>
+
+        <date>November 2007</date>
+
+        <authorinitials>soeren_nb</authorinitials>
+
+        <revremark>Using XInclude to use contents from the User Manual XML
+        Document</revremark>
+      </revision>
+
+      <revision>
+        <revnumber>1.5</revnumber>
+
+        <date>April 2008</date>
+
+        <authorinitials>soeren_nb</authorinitials>
+
+        <revremark>Updated for VirtueMart 1.1.x</revremark>
+      </revision>
+    </revhistory>
+  </articleinfo>
+
+  <section>
+    <title>Preamble</title>
+
+    <para>The content of this document is related to VirtueMart.</para>
+
+    <para>VirtueMart is free Software, licensed under GNU/GPL; VirtueMart [
+    <ulink url="http://virtuemart.net">http://virtuemart.net</ulink> ], ©
+    2005-2008 Sören Eberhardt-Biermann &amp; the VirtueMart Development
+    Team</para>
+
+    <para><emphasis role="strong">The Software 'VirtueMart' is intended
+    </emphasis><emphasis role="strong">for use in Joomla! (Versions 1.0, 1.5)
+    or Mambo (Versions &gt;= 4.5.3, 4.6.x).</emphasis></para>
+
+    <para>(Joomla! and Mambo is free Software, licensed under GNU/GPL; Joomla!
+    is available from <ulink
+    url="http://www.joomla.org">www.joomla.org</ulink>)</para>
+  </section>
+
+  <xi:include href="../User_Manual/User_Manual.xml"
+              xpointer="element(Installation)"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="../User_Manual/User_Manual.xml"
+              xpointer="element(Joomla_Global_Configuration)"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="../User_Manual/User_Manual.xml"
+              xpointer="element(The_Project)"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="../User_Manual/User_Manual.xml"
+              xpointer="element(The_Community)"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="../User_Manual/User_Manual.xml"
+              xpointer="element(The_Documentation)"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+</article>

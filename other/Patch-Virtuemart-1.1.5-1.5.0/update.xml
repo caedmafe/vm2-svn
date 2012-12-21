@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<vmupdate>
+		<forversion>1.1.4</forversion>
+		<toversion>1.5.0</toversion>
+		<releasedate>October 15, 2009</releasedate>
+		<description>This is the patch file for updating VirtueMart from version 1.1.5 to version 1.5.0.</description>
+		<files>
+		</files>
+		<queries>
+		</queries>
+		<vminstallfile>install.virtuemart.php</vminstallfile>		
+</vmupdate>

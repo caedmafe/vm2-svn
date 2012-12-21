@@ -1,0 +1,45 @@
+These are the build scripts for VirtueMart
+You will need them to build installable archives out of the SVN sources.
+
+=== Download + Extract Apache Ant ===
+==============================
+You need to install  Apache Ant in order to build the archives.
+
+You can download the latest version of Apache Ant here:
+http://ant.apache.org/bindownload.cgi
+
+=== Available Ant Tasks ===
+========================
+There are two basic tasks, which will create different package editions
+
+	* one for building the COMPLETE PACKAGE
+		( Task Name: virtuemart_complete )
+		
+	* one for building the Manual Installation Package
+		( Task Name: virtuemart_manual_installation )
+
+Both tasks will create the Language Pack and a Version for Joomla! 1.0.x/Mambo and one for Joomla! 1.5.
+
+==== Adjust the file config.properties ====
+=================================
+Open the file "config.properties" (should be in the same directory as this HOWTO file) with a Text Editor.
+Change the value for "svn.dir" to point to your local checkout copy of the VirtueMart Trunk (SVN).
+
+Example: 
+###
+svn.dir					= C:/joomla/VirtueMart/svn/virtuemart
+###
+where "C:/joomla/VirtueMart/svn/" is the directory that contains the trunk ("build_scripts", "documentation", ..., "virtuemart" )
+
+=== Run Ant on the command line ===
+=================================
+1. Now you need to open a terminal (on Windows: [WindowsKey] + R, then type "cmd").
+2. Change the current working directory to your SVN/build_scripts directory
+	> cd C:\joomla\VirtueMart\svn\build_scripts
+	
+3. Run Ant and specify the target (Complete Package or Manual Install Package)
+	> "C:\Program Files\apache-ant\bin\ant.bat" virtuemart_complete
+	You will then see some messages being printed on the command line.
+	
+4. When everything went ok ([BUILD SUCCESSFUL]), you should now have a new directory "dist" (if you haven't changed the patch name for the dist.dir variable) 
+	which contains the installable files.
