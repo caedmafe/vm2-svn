@@ -77,6 +77,7 @@ class VirtueMartModelMedia extends VmModel {
 		if (!class_exists('VmMediaHandler')) require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'mediahandler.php');
 
 		$app = JFactory::getApplication();
+		$lang =& JFactory::getLanguage();
 		$medias = array();
 		
 		static $_medias = array();
@@ -105,11 +106,21 @@ class VirtueMartModelMedia extends VmModel {
 						}
 						$file_type 	= empty($data->file_type)? $type:$data->file_type;
 						$mime		= empty($data->file_mimetype)? $mime:$data->file_mimetype;
-						$_medias[$id] = VmMediaHandler::createMedia($data,$file_type,$mime);
-						if(is_object($virtuemart_media_id) && !empty($virtuemart_media_id->product_name)) $_medias[$id]->product_name = $virtuemart_media_id->product_name;
+						if($app->isSite()){
+							$selectedLangue = explode(",", $data->file_lang);
+							//vmdebug('selectedLangue',$selectedLangue);
+							if(in_array($lang->getTag(), $selectedLangue) || $data->file_lang == '') {
+								$_medias[$id] = VmMediaHandler::createMedia($data,$file_type,$mime);
+								if(is_object($virtuemart_media_id) && !empty($virtuemart_media_id->product_name)) $_medias[$id]->product_name = $virtuemart_media_id->product_name;
+							}
+						} else {
+							$_medias[$id] = VmMediaHandler::createMedia($data,$file_type,$mime);
+							if(is_object($virtuemart_media_id) && !empty($virtuemart_media_id->product_name)) $_medias[$id]->product_name = $virtuemart_media_id->product_name;
+						}
 					}
-
-					$medias[] = $_medias[$id];
+					if (!empty($_medias[$id])) {
+						$medias[] = $_medias[$id];
+					}
 				}
 			}
 		}
@@ -133,6 +144,7 @@ class VirtueMartModelMedia extends VmModel {
 			$data->file_is_product_image = 0;
 			$data->shared = 0;
 			$data->file_params = 0;
+			$data->file_lang = '';
 
 			$medias[] = VmMediaHandler::createMedia($data,$type,$mime);
 		}

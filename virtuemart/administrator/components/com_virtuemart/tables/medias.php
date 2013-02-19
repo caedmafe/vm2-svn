@@ -61,6 +61,7 @@ class TableMedias extends VmTable {
 
 	var $shared = 0;
 	var $file_params = '';
+	var $file_lang = '';
 
 	/**
 	 * @author Max Milbers

@@ -771,6 +771,10 @@ class VmMediaHandler {
 				}
 			}
 
+			if(!empty($data['vmlangimg'])) {
+				$vmlangimg = implode(",", $data['vmlangimg']);
+				$this->file_lang = $vmlangimg;
+			}
 
 
 			return $data;
@@ -1200,8 +1204,20 @@ class VmMediaHandler {
 						<td class="labelcell">'.JText::_('COM_VIRTUEMART_FILES_FORM_LOCATION').'</td>
 						<td><fieldset class="checkboxes">'.JHTML::_('select.radiolist', $this->getOptions($this->_mLocation), 'media_attributes'.$identify, '', 'value', 'text', $mediaattribtemp).'</fieldset></td></tr>';
 			}
+			
+			// select language for image
+			if (count(vmconfig::get('active_languages'))>1) {
+				$selectedLangue = explode(",", $this->file_lang);
+				$languages = JLanguageHelper::createLanguageList($selectedLangue, constant('JPATH_SITE'), true);
+				$html .= '<tr>
+						<td class="labelcell"><span class="hasTip" title="' . JText::_ ('COM_VIRTUEMART_FILES_FORM_LANGUAGE_TIP') . '">' . JText::_ ('COM_VIRTUEMART_FILES_FORM_LANGUAGE') . '</span></td>
+						<td><fieldset class="inputbox">'.JHTML::_('select.genericlist',  $languages, 'vmlangimg[]', 'size="10" multiple="multiple"', 'value', 'text', $selectedLangue ).'</fieldset></td>
+						</tr>';
+			}
+
 			$html .= '</table>';
 			$html .='<br /></fieldset>';
+
 			$this->addMediaActionByType();
 
 			$html .= '<fieldset class="checkboxes">' ;
