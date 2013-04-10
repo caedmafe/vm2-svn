@@ -90,7 +90,7 @@ class VirtueMartModelMedia extends VmModel {
 
 			$data = $this->getTable('medias');
 			foreach($virtuemart_media_ids as $k => $virtuemart_media_id){
-				if($limit!==0 and $k==$limit) break; // never break if $limit = 0
+				if($limit!==0 and $k==$limit and !empty($medias)) break; // never break if $limit = 0
 				if(is_object($virtuemart_media_id)){
 					$id = $virtuemart_media_id->virtuemart_media_id;
 				} else {
