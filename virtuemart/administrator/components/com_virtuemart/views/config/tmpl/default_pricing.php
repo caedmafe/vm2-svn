@@ -74,6 +74,16 @@ $document->addScriptDeclaration($js);
 					<?php echo VmHTML::checkbox('rappenrundung', $this->config->get('rappenrundung')); ?>
                 </td>
             </tr>
+            <tr>
+                <td class="key">
+			    <span class="hasTip" title="<?php echo JText::_('COM_VIRTUEMART_ADMIN_CFG_PRICE_CVARSWT_TIP'); ?>">
+			    <label for="show_tax"><?php echo JText::_('COM_VIRTUEMART_ADMIN_CFG_PRICE_CVARSWT'); ?>
+			    </span>
+                </td>
+                <td>
+					<?php echo VmHTML::checkbox('cVarswT', VmConfig::get('cVarswT',1)); ?>
+                </td>
+            </tr>
 		</table>
 	    </fieldset>
 

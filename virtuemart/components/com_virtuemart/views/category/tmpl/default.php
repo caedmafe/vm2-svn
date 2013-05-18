@@ -278,7 +278,7 @@ if (!empty($this->products)) {
 					<div class="product-price marginbottom12" id="productPrice<?php echo $product->virtuemart_product_id ?>">
 						<?php
 						if ($this->show_prices == '1') {
-							if (empty($product->prices['salesPrice']) and VmConfig::get ('askprice', 1) and  !$product->images[0]->file_is_downloadable) {
+							if ($product->prices['salesPrice']<=0 and VmConfig::get ('askprice', 1) and  !$product->images[0]->file_is_downloadable) {
 								echo JText::_ ('COM_VIRTUEMART_PRODUCT_ASKPRICE');
 							}
 							//todo add config settings

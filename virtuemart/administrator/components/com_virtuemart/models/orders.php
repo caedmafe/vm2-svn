@@ -949,6 +949,7 @@ $q = 'SELECT virtuemart_order_item_id, product_quantity, order_item_name,
 		foreach($_cart->products as $key=>&$product){
 			foreach($calculation_kinds as $calculation_kind) {
 				//$productRules =$_cart->pricesUnformatted[$key][$calculation_kind];
+				if(!isset($product->prices[$calculation_kind])) continue;
 				$productRules = $product->prices[$calculation_kind];
 				foreach($productRules as $rule){
 					$orderCalcRules = $this->getTable('order_calc_rules');

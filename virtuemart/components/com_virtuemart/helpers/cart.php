@@ -344,7 +344,10 @@ class VirtueMartCart {
 							foreach($customProductData[$customfield->virtuemart_custom_id][$customfield->virtuemart_customfield_id] as &$customData){
 								$muh = $customData;
 								$value = vmFilter::hl( $customData,array('deny_attribute'=>'*'));
-								$value = preg_replace('@<[\/\!]*?[^<>]*?>@si','',$value);//remove all html tags
+								//to strong
+								/* $value = preg_replace('@<[\/\!]*?[^<>]*?>@si','',$value);//remove all html tags  */
+								//lets use instead
+								$value = JComponentHelper::filterText($value);
 								$value = (string)preg_replace('#on[a-z](.+?)\)#si','',$value);//replace start of script onclick() onload()...
 								$value = trim(str_replace('"', ' ', $value),"'") ;
 								$customData = (string)preg_replace('#^\'#si','',$value);
@@ -560,9 +563,7 @@ class VirtueMartCart {
 		}
 		$this->couponCode = $coupon_code;
 		$this->setCartIntoSession();
-		$app = JFactory::getApplication();
-		$app->redirect(JRoute::_('index.php?option=com_virtuemart&view=cart', JText::_('COM_VIRTUEMART_CART_COUPON_VALID')));
-		return '';
+		return JText::_('COM_VIRTUEMART_CART_COUPON_VALID');
 	}
 
 	/**

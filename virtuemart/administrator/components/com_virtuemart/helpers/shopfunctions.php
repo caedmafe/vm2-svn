@@ -1416,11 +1416,11 @@ class ShopFunctions {
 		$filterArray = array('product_name', '`p`.created_on', '`p`.product_sku',
 			'product_s_desc', 'product_desc',
 				'category_name', 'category_description', 'mf_name',
-			'product_price', 'product_special', 'product_sales', 'product_availability', 'product_available_date',
+			'product_price', 'product_special', 'product_sales', 'product_availability', '`p`.product_available_date',
 			'product_height', 'product_width', 'product_length', 'product_lwh_uom',
 			'product_weight', 'product_weight_uom', 'product_in_stock', 'low_stock_notification',
 			 '`p`.modified_on',
-				'product_unit', 'product_packaging', '`p`.virtuemart_product_id', '`pc`.ordering');
+				'product_unit', 'product_packaging', '`p`.virtuemart_product_id', 'pc.ordering');
 		//other possible fields
 		//'p.intnotes',		this is maybe interesting, but then only for admins or special shoppergroups
 

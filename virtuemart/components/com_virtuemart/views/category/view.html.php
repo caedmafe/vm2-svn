@@ -158,7 +158,7 @@ class VirtuemartViewCategory extends VmView {
 		}
 
 		// set search and keyword
-		if ($keyword = vmRequest::uword('keyword', '', ' ')) {
+		if ($keyword = vmRequest::uword('keyword', '0', ' ,-,+')) {
 			$pathway->addItem($keyword);
 			$title .=' ('.$keyword.')';
 		}

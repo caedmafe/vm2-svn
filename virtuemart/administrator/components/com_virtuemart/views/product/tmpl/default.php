@@ -87,7 +87,7 @@ if ($product_parent_id=JRequest::getInt('product_parent_id', false))   $col_prod
 		$num_rows = 0;
 		if( $this->virtuemart_category_id ) { ?>
 			<th>
-				<?php echo $this->sort('ordering', 'COM_VIRTUEMART_FIELDMANAGER_REORDER'); ?>
+				<?php echo $this->sort('pc.ordering', 'COM_VIRTUEMART_FIELDMANAGER_REORDER'); ?>
 				<?php echo JHTML::_('grid.order', $this->productlist); //vmCommonHTML::getSaveOrderButton( $num_rows, 'changeordering' ); ?>
 			</th>
 		<?php } ?>

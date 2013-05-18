@@ -628,8 +628,8 @@ class calculationHelper {
 
 			if($this->_currencyDisplay->_priceConfig['salesPriceWithDiscount']) $this->_cartPrices['salesPriceWithDiscount'] += self::roundInternal($product->prices['salesPriceWithDiscount'],'salesPriceWithDiscount') * $product->quantity;
 			if($this->_currencyDisplay->_priceConfig['discountAmount']){
-				$product->subtotal_discount = $this->_cartPrices['discountAmount'] - self::roundInternal($product->prices['discountAmount'],'discountAmount') * $product->quantity;
-				$this->_cartPrices['discountAmount'] = $product->subtotal_discount;
+				$this->_cartPrices[$cartproductkey]['subtotal_discount'] = self::roundInternal($product->prices['discountAmount'],'discountAmount') * $product->quantity;
+				$this->_cartPrices['discountAmount'] += $this->_cartPrices[$cartproductkey]['subtotal_discount'];
 			}
 			if($this->_currencyDisplay->_priceConfig['priceWithoutTax']) {
 				$product->subtotal = self::roundInternal($product->prices['priceWithoutTax'],'priceWithoutTax') * $product->quantity;
@@ -1088,12 +1088,16 @@ class calculationHelper {
 
 	function calculateCustomPriceWithTax($price, $override_id=0) {
 
-		$taxRules = $this->gatherEffectingRulesForProductPrice('Tax', $override_id);
-		if(!empty($taxRules)){
-			$price = $this->executeCalculation($taxRules, $price, true);
-		}
+		if(VmConfig::get('cVarswT',1)){
+			$taxRules = $this->gatherEffectingRulesForProductPrice('Tax', $override_id);
+			$vattaxRules = $this->gatherEffectingRulesForProductPrice('VatTax', $override_id);
+			$rules = array_merge($taxRules,$vattaxRules);
+			if(!empty($rules)){
+				$price = $this->executeCalculation($rules, $price, true);
+			}
 
-		$price = $this->roundInternal($price);
+			$price = $this->roundInternal($price);
+		}
 
 		return $price;
 	}

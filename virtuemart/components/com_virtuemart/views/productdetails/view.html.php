@@ -102,17 +102,6 @@ class VirtueMartViewProductdetails extends VmView {
 
     }
 
-	if (!empty($product->customfields)) {
-	    foreach ($product->customfields as $k => $custom) {
-		if (!empty($custom->layout_pos)) {
-		    $product->customfieldsSorted[$custom->layout_pos][] = $custom;
-		    unset($product->customfields[$k]);
-		}
-	    }
-	    $product->customfieldsSorted['normal'] = $product->customfields;
-	    unset($product->customfields);
-	}
-
 // 		vmTime('Customs','customs');
 // 		vmdebug('my second $product->customfields',$product->customfields);
 	$last_category_id = shopFunctionsF::getLastVisitedCategoryId();
@@ -134,6 +123,17 @@ class VirtueMartViewProductdetails extends VmView {
 	    return;
 	}
 
+	if (!empty($product->customfields)) {
+	    foreach ($product->customfields as $k => $custom) {
+		if (!empty($custom->layout_pos)) {
+		    $product->customfieldsSorted[$custom->layout_pos][] = $custom;
+		    unset($product->customfields[$k]);
+		}
+	    }
+	    $product->customfieldsSorted['normal'] = $product->customfields;
+	    unset($product->customfields);
+	}
+	
 	$product->event = new stdClass();
 	$product->event->afterDisplayTitle = '';
 	$product->event->beforeDisplayContent = '';
@@ -183,7 +183,7 @@ class VirtueMartViewProductdetails extends VmView {
 
 	// Get the category ID
 
-	if (in_array($last_category_id, $product->categories) ){
+/*	if (in_array($last_category_id, $product->categories) ){
 		$virtuemart_category_id = $last_category_id;
 
 	} else $virtuemart_category_id = JRequest::getInt('virtuemart_category_id',0);
@@ -191,8 +191,8 @@ class VirtueMartViewProductdetails extends VmView {
 	    if (array_key_exists('0', $product->categories))
 		$virtuemart_category_id = $product->categories[0];
 	}
-	$product->virtuemart_category_id = $virtuemart_category_id;
-	shopFunctionsF::setLastVisitedCategoryId($virtuemart_category_id);
+	$product->virtuemart_category_id = $virtuemart_category_id;*/
+	shopFunctionsF::setLastVisitedCategoryId($product->virtuemart_category_id);
 
 	if ($category_model) {
 

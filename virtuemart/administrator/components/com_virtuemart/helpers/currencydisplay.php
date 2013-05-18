@@ -52,8 +52,7 @@ class CurrencyDisplay {
 		$this->_vendorCurrency_code_3 = $row[1];
 		$this->_vendorCurrency_numeric = (int)$row[2];
 
-		//vmdebug('$row ',$row);
-		$converterFile  = VmConfig::get('currency_converter_module');
+		$converterFile  = VmConfig::get('currency_converter_module','convertECB.php');
 
 		if (file_exists( JPATH_VM_ADMINISTRATOR.DS.'plugins'.DS.'currency_converter'.DS.$converterFile )) {
 			$module_filename=substr($converterFile, 0, -4);
